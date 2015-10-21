@@ -16,9 +16,7 @@ class FileEntries(fileRepo: FileRepo) {
   }
 
   def generate(path: String): List[InodeEntry] = {
-    val name = path.split('/').last
-    val prefix = path.substring(0, path.lastIndexOf('/'))
-    val rootNode = DirectoryEntry(name, _rootPrefix = prefix)
+    val rootNode = DirectoryEntry.fromPath(path)
     val nodes = fileRepo.children(rootNode)
     implicit val fanoutFile = (n: InodeEntry) => n match {
       case dir: DirectoryEntry => fileRepo.children(dir)

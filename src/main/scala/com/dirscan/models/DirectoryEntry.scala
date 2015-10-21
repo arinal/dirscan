@@ -5,7 +5,7 @@ case class DirectoryEntry(_name: String,
                           _parent: Option[InodeEntry] = None,
                           _symbolic: Boolean = false,
                           _rootPrefix: String = "")
-  extends InodeEntry(_name, _inode, _parent, _symbolic, _rootPrefix) {
+    extends InodeEntry(_name, _inode, _parent, _symbolic, _rootPrefix) {
 
   private val childrenMap = scala.collection.mutable.Map[String, InodeEntry]()
 
@@ -14,5 +14,13 @@ case class DirectoryEntry(_name: String,
   def add(node: InodeEntry) {
     childrenMap(node.name) = node
     node.parent = Some(this)
+  }
+}
+
+object DirectoryEntry {
+  def fromPath(path: String, inode: Long = 0) = {
+    new DirectoryEntry(_name = path.split('/').last,
+                       _inode = inode,
+                       _rootPrefix = path.substring(0, path.lastIndexOf('/')))
   }
 }

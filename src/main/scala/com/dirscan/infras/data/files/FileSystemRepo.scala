@@ -24,4 +24,8 @@ object FileSystemRepo extends FileRepo {
     new File(directory.fullName).listFiles().foreach(n => directory.add(n))
     directory.children
   }
+
+  def children(path: String) : List[InodeEntry] = {
+    children(DirectoryEntry.fromPath(path))
+  }
 }

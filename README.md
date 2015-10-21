@@ -8,8 +8,19 @@ Implementation wise, dirscan will support three arguments:
 - `--list-from-db=<dbname>`: list the content of the database `<dbname>`.
 - `--update-db=<dbname>`: updates `<dbname>` by adding new files within the current working directory (if any) and deleting entries if it does not exist anymore.
 
-## Example Run
-Below is given the expected output of dirscan:
+## Getting started
+This is project is still in its early stage, all you can do for playing with it is fire up an automatic testing.
+
+```
+Clone repository from github and make it as current directory
+$ git clone https://github.com/arinal/dirscan.git && cd dirscan
+
+Run the test
+$ ./activator test
+```
+
+## Example run (not done yet)
+Below is the expected output of dirscan:
 ```
 $ ./dirscan --new-db=list.db
 Storing list of items within the current directory into “list.db”…
