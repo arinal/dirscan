@@ -4,7 +4,7 @@ import dirscan.models.{DirectoryEntry, FileEntry}
 
 object TestUtils {
 
-  val PLAYGROUND_PATH: String = "src/test/resources/playground"
+  val PLAYGROUND_PATH: String = "src/test/playground"
 
   def constructTree = {
     val dir1 = DirectoryEntry("dir1")

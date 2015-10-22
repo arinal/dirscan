@@ -1,5 +1,6 @@
 package spec
 
+import dirscan.infras.data.files.FileSystemRepo
 import dirscan.models.{DirectoryEntry, FileEntry, FileService}
 import org.scalatest._
 import utils.TestUtils
@@ -22,7 +23,7 @@ class FileEntriesSpec extends FlatSpec with Matchers {
   }
 
   "generate entries targeted 'src/test/resources' path" should "have length 11" in {
-    val fileList = FileService() generate TestUtils.PLAYGROUND_PATH
+    val fileList = FileService() traverseRepo TestUtils.PLAYGROUND_PATH
 
     fileList should have length 13
     fileList filter (_.isInstanceOf[FileEntry]) should have length 9
@@ -30,12 +31,14 @@ class FileEntriesSpec extends FlatSpec with Matchers {
   }
 
   it should "have inode number on each element" in {
-    val fileList = FileService() generate TestUtils.PLAYGROUND_PATH
-    fileList foreach (_.inode should be > 100000L)
+    FileService() traverseRepo TestUtils.PLAYGROUND_PATH foreach (_.inode should be > 100000L)
   }
 
   it should "consists of two symbolic links" in {
-    val fileList = FileService() generate TestUtils.PLAYGROUND_PATH
-    fileList filter (_.symbolic) should have length 2
+    FileService() traverseRepo TestUtils.PLAYGROUND_PATH filter (_.symbolic) should have length 2
+  }
+
+  it should "all be prefixed with 'src/test/playground" in {
+    FileSystemRepo childrenOf TestUtils.PLAYGROUND_PATH foreach (_.fullName should startWith ("src/test/playground"))
   }
 }

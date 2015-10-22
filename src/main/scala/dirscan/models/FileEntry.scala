@@ -5,9 +5,11 @@ case class FileEntry(_name: String = "",
                      _inode: Long = 0,
                      _parentId: Int = 0,
                      _symbolic: Boolean = false,
-                     _rootPrefix: String = "")
-  extends InodeEntry(_name, FileService.chooseFullname(_name, _fullName, "", _rootPrefix, _parentId),
-    _inode, _parentId, _symbolic)
+                     _rootPrefix: String = "",
+                     _id: Int = 0)
+  extends InodeEntry(
+    _name, FileService.chooseFullname(_name, _fullName, "", _rootPrefix, _parentId),
+    _inode, _parentId, _symbolic, _id)
 
 object FileEntry {
   def fromParent(name: String, inode: Long, parent: Option[DirectoryEntry],

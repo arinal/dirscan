@@ -8,6 +8,36 @@ import dirscan.models.{DirectoryEntry, FileEntry, FileRepo, InodeEntry}
 
 object FileSystemRepo extends FileRepo {
 
+  def byPath(path: String): Option[InodeEntry] = {
+    implicit val f2e = (f: File) => {
+      val (inode, sym) = inodeSym(f)
+      if (f.isDirectory) DirectoryEntry.fromPath(path, inode, sym)
+      else FileEntry(f.getName, path, inode, _symbolic = sym)
+    }
+    val file = new File(path)
+    if (file.exists()) Some(file) else None
+  }
+
+  def childrenOf(directory: DirectoryEntry): List[InodeEntry] = {
+    implicit val f2e = (f: File) => {
+      val ((inode, sym), parent) = inodeSym(f.getAbsolutePath) -> Some(directory)
+      if (f.isDirectory) DirectoryEntry.fromParent(parent, f.getName, inode, sym)
+      else FileEntry.fromParent(f.getName, inode, parent, sym)
+    }
+    new File(directory.fullName).listFiles foreach (directory.add(_))
+    directory.children
+  }
+
+  def childrenOf(path: String) : List[InodeEntry] = {
+    val (inode, sym) = inodeSym(path)
+    childrenOf(DirectoryEntry.fromPath(path, inode, sym))
+  }
+
+  def byId(id: Int): Some[InodeEntry] = ???
+  def all: List[InodeEntry] = ???
+  def delete(id: Int): Unit = ???
+  def save(entity: InodeEntry): Unit = ???
+
   def symbolic(path: String): Boolean = Files.isSymbolicLink(Paths.get(path))
 
   def inodeNumber(path: String): Long = {
@@ -16,33 +46,7 @@ object FileSystemRepo extends FileRepo {
     val inode = key.substring(key.indexOf("ino=") + 4, key.indexOf(")"))
     inode.toLong
   }
-  
-  def byPath(path: String, parent: Option[DirectoryEntry] = None): InodeEntry = {
-    implicit val f2e = mkFile2Entry(parent)
-    new File(path)
-  }
 
-  def childrenOf(directory: DirectoryEntry): List[InodeEntry] = {
-    implicit val f2e = mkFile2Entry(Some(directory))
-    new File(directory.fullName).listFiles.foreach(directory.add(_))
-    directory.children
-  }
-
-  def childrenOf(path: String) : List[InodeEntry] = {
-    childrenOf(DirectoryEntry.fromPath(path))
-  }
-
-  def byId(id: Int): InodeEntry = ???
-  def all: List[InodeEntry] = ???
-  def delete(id: Int): Unit = ???
-  def save(entity: InodeEntry): Unit = ???
-
-  def mkFile2Entry(parent: Option[DirectoryEntry]) = {
-    f: File => {
-      val inode = inodeNumber(f.getAbsolutePath)
-      val sym = symbolic(f.getAbsolutePath)
-      if (f.isDirectory) DirectoryEntry.fromParent(parent, f.getName, inode, sym)
-      else FileEntry.fromParent(f.getName, inode, parent, sym)
-    }
-  }
+  def inodeSym(path: String) = (inodeNumber(path), symbolic(path))
+  def inodeSym(file: File): (Long, Boolean) = inodeSym(file.getAbsolutePath)
 }

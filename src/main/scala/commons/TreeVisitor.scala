@@ -2,7 +2,7 @@ package commons
 
 import scala.annotation.tailrec
 
-object DfsVisitor {
+object TreeVisitor {
   def traverse[A](fringe: A*)(implicit canFanout: A => Boolean, fanout: A => List[A]): List[A] = traverse(fringe.toList)
 
   def traverse[A](fringe: List[A])(implicit canFanout: A => Boolean, fanout: A => List[A]) = {

@@ -5,9 +5,11 @@ case class DirectoryEntry(_name: String = "",
                           _inode: Long = 0,
                           _parentId: Int = 0,
                           _symbolic: Boolean = false,
-                          _rootPrefix: String = "")
-  extends InodeEntry(_name, FileService.chooseFullname(_name, _fullName, _rootPrefix, parentId = _parentId),
-    _inode, _parentId, _symbolic) {
+                          _rootPrefix: String = "",
+                          _id: Int = 0)
+  extends InodeEntry(
+    _name, FileService.chooseFullname(_name, _fullName, _rootPrefix, parentId = _parentId),
+    _inode, _parentId, _symbolic, _id) {
 
   private val childrenMap = scala.collection.mutable.Map[String, InodeEntry]()
 
@@ -24,16 +26,16 @@ case class DirectoryEntry(_name: String = "",
       childrenMap(node.name) = node
   }
 
-  def add(nodes: InodeEntry*): Unit = nodes.foreach(n => add(n))
+  def add(nodes: InodeEntry*): Unit = add(nodes.toList)
+  def add(nodes: List[InodeEntry]): Unit = nodes.foreach(n => add(n))
 }
 
 object DirectoryEntry {
-  def fromPath(path: String, inode: Long = 0) = {
-    new DirectoryEntry(_name = path.split('/').last, path, _inode = inode)
-  }
+  def fromPath(path: String, inode: Long = 0, symbolic: Boolean) =
+    new DirectoryEntry(_name = path.split('/').last, path, _inode = inode, _symbolic = symbolic)
 
   def fromParent(parent: Option[DirectoryEntry], name: String, inode: Long,
-  symbolic: Boolean = false, rootPrefix: String = "") = {
+                 symbolic: Boolean = false, rootPrefix: String = "") = {
     val fullName = FileService.chooseFullname(name = name, parentName = parent.map(_.fullName).getOrElse(""))
     val dir = new DirectoryEntry(name, fullName, inode, parent.map(_.id).getOrElse(0), symbolic)
     dir.parent = parent

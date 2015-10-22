@@ -1,6 +1,6 @@
 package dirscan.models
 
-import commons.DfsVisitor
+import commons.TreeVisitor
 import dirscan.infras.data.files.FileSystemRepo
 
 class FileService(fileRepo: FileRepo) {
@@ -8,26 +8,31 @@ class FileService(fileRepo: FileRepo) {
   implicit val canFanout = (n: InodeEntry) => n.isInstanceOf[DirectoryEntry] && !n.symbolic
 
   def traverse(entries: InodeEntry*) = {
-    implicit val fanout = (n:InodeEntry) => n match {
+    implicit val fanout = (n: InodeEntry) => n match {
       case dir: DirectoryEntry => dir.children
       case _: FileEntry => List()
     }
-    DfsVisitor.traverse[InodeEntry](entries.toList)
+    TreeVisitor.traverse[InodeEntry](entries.toList)
   }
 
-  def generate(path: String): List[InodeEntry] = {
-    val rootNode = DirectoryEntry.fromPath(path)
-    val nodes = fileRepo.childrenOf(rootNode)
+  def traverseRepo(path: String): List[InodeEntry] = {
+    val roots = fileRepo.childrenOf(path).map(FileService.removeParent)
     implicit val fanoutFile = (n: InodeEntry) => n match {
       case dir: DirectoryEntry => fileRepo.childrenOf(dir)
       case _: FileEntry => List()
     }
-    DfsVisitor.traverse[InodeEntry](nodes)
+    TreeVisitor.traverse[InodeEntry](roots)
   }
 }
 
 object FileService {
   def apply(fileRepo: FileRepo = FileSystemRepo) = new FileService(fileRepo)
+
+  def transfer(path: String, targetRepo: FileRepo, sourceRepo: FileRepo = FileSystemRepo) = {
+    val sourceSvc = FileService(sourceRepo)
+    val sources = sourceSvc.traverseRepo(path).sortBy(_.path.length)
+    for (f <- sources) targetRepo.save(f)
+  }
 
   def chooseFullname(name: String = "", fullName: String = "",
                      parentName: String = "", rootPrefix: String = "", parentId: Int = 0) =
@@ -35,4 +40,11 @@ object FileService {
     else if (parentId == 0 && rootPrefix != "") s"$rootPrefix/$name"
     else if (parentName != "") s"$parentName/$name"
     else name
+
+  def removeParent(f: InodeEntry) = {
+    f match {
+      case DirectoryEntry(n, full, in, _, sym, rp, id) => DirectoryEntry(n, full, in, 0, sym, rp, id)
+      case FileEntry(n, full, in, _, sym, rp, id) => FileEntry(n, full, in, 0, sym, rp, id)
+    }
+  }
 }
