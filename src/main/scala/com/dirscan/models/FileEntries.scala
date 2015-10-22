@@ -5,7 +5,7 @@ import com.dirscan.infras.data.files.FileSystemRepo
 
 class FileEntries(fileRepo: FileRepo) {
 
-  implicit val canFanout = (n: InodeEntry) => n.isInstanceOf[DirectoryEntry]
+  implicit val canFanout = (n: InodeEntry) => n.isInstanceOf[DirectoryEntry] && !n.symbolic
 
   def traverse(entries: InodeEntry*) = {
     implicit val fanout = (n:InodeEntry) => n match {

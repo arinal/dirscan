@@ -1,8 +1,8 @@
 package com.dirscan.ui.konsole
 
-import com.dirscan.infras.data.files.FileSystemRepo
+import com.dirscan.infras.data.files._
 
 object Main extends App {
-  println(FileSystemRepo.inodeNumber("src/test/resources/playground/file1"))
+  val path = "src/test/resources/playground/dir2/dir1"
+  FileSystemRepo.children(path).foreach(n => println(n.symbolic))
 }
-
