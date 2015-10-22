@@ -1,4 +1,4 @@
-package com.dirscan.commons
+package commons
 
 import scala.annotation.tailrec
 

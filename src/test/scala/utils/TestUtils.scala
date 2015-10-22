@@ -1,4 +1,6 @@
-import com.dirscan.models.{DirectoryEntry, FileEntry}
+package utils
+
+import dirscan.models.{DirectoryEntry, FileEntry}
 
 object TestUtils {
 
