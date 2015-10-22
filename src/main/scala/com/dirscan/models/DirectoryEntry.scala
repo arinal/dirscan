@@ -10,11 +10,15 @@ case class DirectoryEntry(_name: String,
   private val childrenMap = scala.collection.mutable.Map[String, InodeEntry]()
 
   def children = childrenMap.values.toList.sortBy(_.name)
+  def mkfile(name: String, inode: Long = 0, symbolic: Boolean = false) = FileEntry(name, inode, Some(this), symbolic)
+  def mkdir(name: String, inode: Long = 0, symbolic: Boolean = false) = DirectoryEntry(name, inode, Some(this), symbolic)
 
   def add(node: InodeEntry) {
-    childrenMap(node.name) = node
-    node.parent = Some(this)
+    if (node.parent == Some(this))
+      childrenMap(node.name) = node
   }
+
+  def add(nodes: InodeEntry*): Unit = nodes.foreach(n => add(n))
 }
 
 object DirectoryEntry {

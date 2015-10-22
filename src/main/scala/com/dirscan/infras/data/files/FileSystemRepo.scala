@@ -8,11 +8,6 @@ import com.dirscan.models._
 
 object FileSystemRepo extends FileRepo {
 
-  implicit def file2Entry(f: File): InodeEntry = {
-    val inode = inodeNumber(f.getCanonicalPath)
-    if (f.isDirectory) DirectoryEntry(f.getName, inode) else FileEntry(f.getName, inode)
-  }
-
   def inodeNumber(path: String): Long = {
     val attr = Files.readAttributes(Paths.get(path), classOf[BasicFileAttributes])
     val key = attr.fileKey.toString
@@ -21,7 +16,12 @@ object FileSystemRepo extends FileRepo {
   }
 
   def children(directory: DirectoryEntry): List[InodeEntry] = {
-    new File(directory.fullName).listFiles().foreach(n => directory.add(n))
+    implicit def file2Entry(f: File): InodeEntry = {
+      val inode = inodeNumber(f.getCanonicalPath)
+      val parent = Some(directory)
+      if (f.isDirectory) DirectoryEntry(f.getName, inode, parent) else FileEntry(f.getName, inode, parent)
+    }
+    new File(directory.fullName).listFiles().foreach(f => directory.add(f))
     directory.children
   }
 

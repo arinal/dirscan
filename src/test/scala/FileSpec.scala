@@ -19,7 +19,7 @@ class FileSpec extends FlatSpec with Matchers {
     fileList.filter(n => n.isInstanceOf[DirectoryEntry]) should have length 3
   }
 
-  it should "have inode number" in {
+  it should "have inode number on each element" in {
     val fileList = FileEntries().generate("src/test/resources/playground")
     fileList.map(_.inode should be > 100000L)
   }
