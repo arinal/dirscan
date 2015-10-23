@@ -5,32 +5,30 @@ import dirscan.models.{FileRepo, InodeEntry}
 
 class FileSyncer(path: String, indexRepo: FileRepo, actualRepo: FileRepo) {
 
-  val traverser = FileTraverser(path, actualRepo)
-
   def prepareTargetRepo() = indexRepo.reconstruct()
 
   def transfer() {
-    val sources = traverser.traverseRepo sortBy (_.level)
-    for (f <- sources) indexRepo.save(f)
+    val sources = FileTraverser.traverseRepo(path, actualRepo) sortBy (_.level)
+    sources.foreach(indexRepo.save(_))
   }
 
   def allIndexedEntries = indexRepo.all
 
   def diff = {
-    val fromFiles = traverser.traverseRepo.toSet
+    val fromFiles = FileTraverser.traverseRepo(path, actualRepo).toSet
     val fromIndex = allIndexedEntries.toSet
     (fromFiles -- fromIndex, fromIndex -- fromFiles)
   }
-  
-  def patch(diffTuple: (Set[InodeEntry], Set[InodeEntry])) {
-    val (pluses, minuses) = diffTuple
-    pluses.toList sortBy (_.level) foreach indexRepo.save
-    minuses.toList sortBy (-_.level) foreach (f => indexRepo.delete(f.id))
-    // you can use this insted:
-    // minuses.toList sorted Ordering.by((_: InodeEntry).level).reverse foreach (f => indexRepo.delete(f.id))
+
+  def patch(pluses: Set[InodeEntry], minuses: Set[InodeEntry]) {
+    pluses foreach indexRepo.save
+    minuses foreach (f => indexRepo.delete(f.id))
   }
 
-  def patch(): Unit = patch(diff)
+  def patch(diffTuple: (Set[InodeEntry], Set[InodeEntry]) = this.diff) {
+    val (pluses, minuses) = diffTuple
+    patch(pluses, minuses)
+  }
 }
 
 object FileSyncer {

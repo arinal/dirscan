@@ -4,7 +4,7 @@ import commons.TreeVisitor
 import dirscan.infras.data.files.FileSystemRepo
 import dirscan.models.{DirectoryEntry, FileEntry, FileRepo, InodeEntry}
 
-class FileTraverser(path: String, fileRepo: FileRepo) {
+object FileTraverser {
 
   implicit val canFanout = (n: InodeEntry) => n.isInstanceOf[DirectoryEntry] && !n.symbolic
 
@@ -16,16 +16,12 @@ class FileTraverser(path: String, fileRepo: FileRepo) {
     TreeVisitor.traverse[InodeEntry](entries.toList)
   }
 
-  def traverseRepo: List[InodeEntry] = {
-    val roots = fileRepo.childrenOf(path).map(FileService.removeParent)
+  def traverseRepo(path: String, fileRepo: FileRepo = FileSystemRepo): List[InodeEntry] = {
+    val roots = fileRepo.childrenOf(path).map(Utils.removeParent)
     implicit val fanoutFile = (n: InodeEntry) => n match {
       case dir: DirectoryEntry => fileRepo.childrenOf(dir)
       case _: FileEntry => List()
     }
     TreeVisitor.traverse[InodeEntry](roots)
   }
-}
-
-object FileTraverser {
-  def apply(path: String = "", fileRepo: FileRepo = FileSystemRepo) = new FileTraverser(path, fileRepo)
 }

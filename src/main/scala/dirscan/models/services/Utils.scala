@@ -2,7 +2,7 @@ package dirscan.models.services
 
 import dirscan.models.{DirectoryEntry, FileEntry, InodeEntry}
 
-object FileService {
+object Utils {
   def chooseFullname(name: String = "", fullName: String = "",
                      parentName: String = "", rootPrefix: String = "", parentId: Int = 0) =
     if (fullName != "") fullName

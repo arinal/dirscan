@@ -4,26 +4,28 @@ import java.util.Scanner
 
 object DirscanApp {
 
+  val commandMap = Map(1 -> "new", 2 -> "list", 3 -> "diff", 4 -> "update")
+
   def main(args: Array[String]) {
     val workingPath = "."
 
     val (command, dbName) = if (args.isEmpty) fromMenu else parse(args(0))
     val workflow = new UIWorkflow(workingPath, dbName)
 
-    if (command == "newdb") workflow.executeNewDb()
-    else if (command == "listdb") workflow.executeListDb()
-    else if (command == "updatedb") workflow.executeUpdateDb()
+    if (command == commandMap(1)) workflow.executeNewDb()
+    else if (command == commandMap(2)) workflow.executeListDb()
+    else if (command == commandMap(3)) workflow.executeDiff()
+    else if (command == commandMap(4)) workflow.executeUpdateDb()
   }
 
   def fromMenu: (String, String) = {
-    val map = Map(1 -> "newdb", 2 -> "listdb", 3 -> "updatedb")
     val scanner = new Scanner(System.in)
-    print(
-"""      1. Traverse files and save to new db
-      2. List all files indexed by db
-      3. Scan and update db
-    Option: """)
-    val command = map(scanner.nextInt())
+    print("""1. Traverse files and save to new db
+            |2. List all files indexed by db
+            |3. List the differences between entries in filesystem and db
+            |4. Scan and update db
+            |Option: """.stripMargin)
+    val command = commandMap(scanner.nextInt())
     print("Specify db name: ")
     (command, scanner.next())
   }

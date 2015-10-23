@@ -15,17 +15,31 @@ class UIWorkflow(workingPath: String, databaseName: String) {
     println("Done.")
   }
 
-  def executeListDb() = syncer.allIndexedEntries foreach printEntry
+  def executeListDb() {
+    println("Listing stored items from “list”:")
+    syncer.allIndexedEntries foreach printEntry
+  }
 
-  def executeUpdateDb() {
+  def executeDiff() {
     val (pluses, minuses) = syncer.diff
 
-    if (pluses.nonEmpty) println("Add list..")
+    if (pluses.nonEmpty) println("Add list…")
     pluses foreach printEntry
-    if (minuses.nonEmpty) println("Remove list..")
+    if (minuses.nonEmpty) println("Remove list…")
     minuses foreach printEntry
 
-    syncer.patch((pluses, minuses))
+    (pluses, minuses)
+  }
+
+  def executeUpdateDb() = {
+    val (pluses, minuses) = syncer.diff
+    if (pluses.isEmpty && minuses.isEmpty)
+      println("There are no differences. DB is already updated.")
+    else {
+      println(s"Updating list of items within current directory into “$databaseName”…")
+      syncer.patch(pluses, minuses)
+      println("Done.")
+    }
   }
 
   def printEntry(f: InodeEntry) {

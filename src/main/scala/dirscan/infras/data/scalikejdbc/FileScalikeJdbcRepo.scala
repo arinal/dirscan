@@ -10,6 +10,9 @@ class FileScalikeJdbcRepo(fileName: String) extends FileRepo {
   GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(enabled = false)
   ConnectionPool.singleton(s"jdbc:h2:file:./$fileName", "", "")
 
+  // Class.forName("org.sqlite.JDBC")
+  // ConnectionPool.singleton(s"jdbc:sqlite:$fileName", null, null)
+
   implicit val session = AutoSession
 
   def childrenOf(directory: DirectoryEntry): List[InodeEntry] = childrenOf(directory.fullName)
@@ -25,8 +28,8 @@ class FileScalikeJdbcRepo(fileName: String) extends FileRepo {
       .map(_.toMap()).list().apply().map(map2File)
 
   def byPath(path: String): Option[InodeEntry] =
-      sql"""select id, name, inode, fullname, level, symbolic, directory, parent from files where fullname = $path"""
-        .map(_.toMap()).single().apply().map(map2File)
+    sql"""select id, name, inode, fullname, level, symbolic, directory, parent from files where fullname = $path"""
+      .map(_.toMap()).single().apply().map(map2File)
 
   def byId(id: Int): Option[InodeEntry] =
     sql"""select id, name, inode, fullname, level, symbolic, directory, parent from files where id = $id"""
@@ -51,14 +54,13 @@ class FileScalikeJdbcRepo(fileName: String) extends FileRepo {
     sql"""
           create table files (
             id int not null primary key,
-            name nvarchar(128),
-            fullname nvarchar(255),
+            name nvarchar(255),
+            fullname nvarchar(511),
             level int,
             inode bigint,
             symbolic boolean,
             parent int,
             directory boolean,
-            foreign key(parent) references files(id)
           )
       """.execute().apply
 
@@ -70,19 +72,19 @@ class FileScalikeJdbcRepo(fileName: String) extends FileRepo {
   def map2File(map: Map[String, Any]): InodeEntry =
     if (map("DIRECTORY").asInstanceOf[Boolean])
       DirectoryEntry(map("NAME").asInstanceOf[String],
-        map("FULLNAME").asInstanceOf[String],
-        map("INODE").asInstanceOf[Long],
-        if (map.contains("PARENT")) map("PARENT").asInstanceOf[Int] else 0,
-        map("SYMBOLIC").asInstanceOf[Boolean],
-        _id = map("ID").asInstanceOf[Int],
-        _level = map("LEVEL").asInstanceOf[Int]
+                     map("FULLNAME").asInstanceOf[String],
+                     map("INODE").asInstanceOf[Long],
+                     if (map.contains("PARENT")) map("PARENT").asInstanceOf[Int] else 0,
+                     map("SYMBOLIC").asInstanceOf[Boolean],
+                     _id = map("ID").asInstanceOf[Int],
+                     _level = map("LEVEL").asInstanceOf[Int]
       )
     else FileEntry(map("NAME").asInstanceOf[String],
-      map("FULLNAME").asInstanceOf[String],
-      map("INODE").asInstanceOf[Long],
-      if (map.contains("PARENT")) map("PARENT").asInstanceOf[Int] else 0,
-      map("SYMBOLIC").asInstanceOf[Boolean],
-      _id = map("ID").asInstanceOf[Int],
-      _level = map("LEVEL").asInstanceOf[Int]
+                   map("FULLNAME").asInstanceOf[String],
+                   map("INODE").asInstanceOf[Long],
+                   if (map.contains("PARENT")) map("PARENT").asInstanceOf[Int] else 0,
+                   map("SYMBOLIC").asInstanceOf[Boolean],
+                   _id = map("ID").asInstanceOf[Int],
+                   _level = map("LEVEL").asInstanceOf[Int]
     )
 }
