@@ -1,5 +1,7 @@
 package dirscan.models
 
+import dirscan.models.services.FileService
+
 case class FileEntry(_name: String = "",
                      _fullName: String = "",
                      _inode: Long = 0,

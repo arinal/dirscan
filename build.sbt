@@ -4,6 +4,8 @@ version := "1.0"
 
 scalaVersion := "2.11.7"
 
+mainClass in Compile := Some("dirscan.ui.konsole.DirscanApp")
+
 libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc"       % "2.2.9",
   "com.h2database"  %  "h2"                % "1.4.190",

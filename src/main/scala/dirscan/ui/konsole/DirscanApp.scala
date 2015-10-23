@@ -1,47 +1,75 @@
 package dirscan.ui.konsole
 
-import java.io.File
+import java.util.Scanner
 
 import dirscan.infras.data.scalike.FileScalikeRepo
-import dirscan.models.{DirectoryEntry, FileService}
+import dirscan.models._
+import dirscan.models.services.FileSyncService
 
 object DirscanApp {
 
-  def main(args: Array[String]): Unit = {
+  val workingPath = "src/test/temp-playground"
 
-    val input = args(0)
-
-    parse(input) match {
-      case (command, dbname) => command match {
+  def main(args: Array[String]) {
+    val input = if (args.isEmpty) fromMenu else parse(args(0))
+    input match {
+      case (command, dbName) => command match {
         case "newdb" =>
-          executeNewDb(dbname)
+          executeNewDb(dbName)
         case "listdb" =>
-          executeListDb(dbname)
+          executeListDb(dbName)
         case "updatedb" =>
-          executeUpdateDb(dbname)
+          executeUpdateDb(dbName)
       }
     }
   }
 
-  def executeNewDb(dbname: String): Unit = {
-    List(s"$dbname.mv.db", s"$dbname.trace.db") map (new File(_)) filter (_.exists()) foreach (_.delete())
+  def fromMenu: (String, String) = {
+    val map = Map(1 -> "newdb", 2 -> "listdb", 3 -> "updatedb")
+    val scanner = new Scanner(System.in)
 
-    println(s"Storing list of items within the current directory into “$dbname”…")
-    val dbRepo = new FileScalikeRepo(dbname)
+    print(
+"""1. Traverse files and save to new db
+2. List all files indexed by db
+3. Scan and update db
+Option: """)
+
+    val command = map(scanner.nextInt())
+    print("Specify db name: ")
+    (command, scanner.next())
+  }
+
+  def executeNewDb(dbName: String) {
+    val dbRepo = new FileScalikeRepo(dbName)
+    dbRepo.deleteDbFile(dbName)
     dbRepo.createFileTable
-    FileService.transfer(".", dbRepo)
+
+    println(s"Storing list of items within the current directory into “$dbName”…")
+    FileSyncService(workingPath, dbRepo).transfer
     println("Done.")
   }
 
-  def executeListDb(dbname: String): Unit = {
-    val dbrepo = new FileScalikeRepo(dbname)
-    dbrepo.all.foreach { f =>
-      val fileType = if (f.symbolic) "sym" else if (f.isInstanceOf[DirectoryEntry]) "dir" else "file"
-      println(s"($fileType) ${f.fullName}")
-    }
+  def executeListDb(dbName: String) {
+    val dbRepo = new FileScalikeRepo(dbName)
+    dbRepo.all foreach printEntry
   }
 
-  def executeUpdateDb(dbname: String): Unit = ???
+  def executeUpdateDb(dbName: String) {
+    val syncer = FileSyncService(workingPath, new FileScalikeRepo(dbName))
+    val diff = syncer.diff
+
+    print("Adding..")
+    diff._1 foreach printEntry
+    print("Deleting..")
+    diff._2 foreach printEntry
+
+    syncer.sync(diff)
+  }
+
+  def printEntry(f: InodeEntry) {
+    val fileType = if (f.symbolic) "sym" else if (f.isInstanceOf[DirectoryEntry]) "dir" else "file"
+    println(s"($fileType) ${f.fullName}")
+  }
 
   def parse(assignment: String) = {
     val split = assignment.split('=')

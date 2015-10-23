@@ -1,9 +1,13 @@
 package dirscan.infras.data.scalike
 
+import java.io.File
+
 import dirscan.models.{DirectoryEntry, FileEntry, FileRepo, InodeEntry}
 import scalikejdbc._
 
 class FileScalikeRepo(fileName: String) extends FileRepo {
+  def deleteDbFile(dbName: String) =
+    List(s"$dbName.mv.db", s"$dbName.trace.db") map (new File(_)) filter (_.exists()) foreach (_.delete())
 
   ConnectionPool.singleton(s"jdbc:h2:file:./$fileName", "", "")
   implicit val session = AutoSession
@@ -34,7 +38,7 @@ class FileScalikeRepo(fileName: String) extends FileRepo {
   }
 
   def all: List[InodeEntry] = {
-    sql"select id, name, inode, fullname, symbolic, directory, parent from files order by length(fullname)"
+    sql"select id, name, inode, fullname, symbolic, directory, parent from files order by fullname"
       .map(_.toMap()).list().apply().map(map2File)
   }
 
