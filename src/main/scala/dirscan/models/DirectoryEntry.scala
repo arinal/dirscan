@@ -8,10 +8,10 @@ case class DirectoryEntry(_name: String = "",
                           _parentId: Int = 0,
                           _symbolic: Boolean = false,
                           _rootPrefix: String = "",
-                          _id: Int = 0)
+                          _id: Int = 0, _level: Int = 0)
   extends InodeEntry(
     _name, FileService.chooseFullname(_name, _fullName, _rootPrefix, parentId = _parentId),
-    _inode, _parentId, _symbolic, _id) {
+    _inode, _parentId, _symbolic, _id, _level) {
 
   private val childrenMap = scala.collection.mutable.Map[String, InodeEntry]()
 

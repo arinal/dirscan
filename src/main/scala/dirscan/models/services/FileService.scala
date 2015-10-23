@@ -12,9 +12,8 @@ object FileService {
 
   def removeParent(f: InodeEntry) = {
     f match {
-      case DirectoryEntry(n, full, in, _, sym, rp, id) => DirectoryEntry(n, full, in, 0, sym, rp, id)
-      case FileEntry(n, full, in, _, sym, rp, id) => FileEntry(n, full, in, 0, sym, rp, id)
+      case DirectoryEntry(n, full, in, _, sym, rp, id, lvl) => DirectoryEntry(n, full, in, 0, sym, rp, id, lvl)
+      case FileEntry(n, full, in, _, sym, rp, id, lvl) => FileEntry(n, full, in, 0, sym, rp, id, lvl)
     }
   }
 }
-

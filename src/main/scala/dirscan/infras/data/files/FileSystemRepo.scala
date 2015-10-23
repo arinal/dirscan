@@ -37,6 +37,7 @@ object FileSystemRepo extends FileRepo {
   def all: List[InodeEntry] = ???
   def delete(id: Int): Unit = ???
   def save(entity: InodeEntry): Unit = ???
+  def reconstruct(): Unit = ???
 
   def symbolic(path: String): Boolean = Files.isSymbolicLink(Paths.get(path))
 

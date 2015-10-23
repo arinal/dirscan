@@ -24,7 +24,7 @@ class FileEntriesSpec extends FlatSpec with Matchers {
   }
 
   "generate entries targeted 'src/test/resources' path" should "have length 11" in {
-    val fileList = FileTraverser() traverseRepo TestUtils.PLAYGROUND_PATH
+    val fileList = FileTraverser(rootPath) traverseRepo
 
     fileList should have length 13
     fileList filter (_.isInstanceOf[FileEntry]) should have length 9
@@ -32,14 +32,16 @@ class FileEntriesSpec extends FlatSpec with Matchers {
   }
 
   it should "have inode number on each element" in {
-    FileTraverser() traverseRepo TestUtils.PLAYGROUND_PATH foreach (_.inode should be > 100000L)
+    FileTraverser(rootPath).traverseRepo foreach (_.inode should be > 100000L)
   }
 
   it should "consists of two symbolic links" in {
-    FileTraverser() traverseRepo TestUtils.PLAYGROUND_PATH filter (_.symbolic) should have length 2
+    FileTraverser(rootPath).traverseRepo filter (_.symbolic) should have length 2
   }
 
   it should "all be prefixed with 'src/test/playground" in {
-    FileSystemRepo childrenOf TestUtils.PLAYGROUND_PATH foreach (_.fullName should startWith ("src/test/playground"))
+    FileSystemRepo childrenOf rootPath foreach (_.fullName should startWith ("src/test/playground"))
   }
+
+  val rootPath = TestUtils.PLAYGROUND_PATH
 }
