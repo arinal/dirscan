@@ -33,14 +33,6 @@ object FileSystemRepo extends FileRepo {
     childrenOf(DirectoryEntry.fromPath(path, inode, sym))
   }
 
-  def byId(id: Int): Some[InodeEntry] = ???
-  def all: List[InodeEntry] = ???
-  def delete(id: Int): Unit = ???
-  def save(entity: InodeEntry): Unit = ???
-  def reconstruct(): Unit = ???
-
-  def symbolic(path: String): Boolean = Files.isSymbolicLink(Paths.get(path))
-
   def inodeNumber(path: String): Long = {
     val attr = Files.readAttributes(Paths.get(path), classOf[BasicFileAttributes])
     val key = attr.fileKey.toString
@@ -48,6 +40,12 @@ object FileSystemRepo extends FileRepo {
     inode.toLong
   }
 
+  def symbolic(path: String): Boolean = Files.isSymbolicLink(Paths.get(path))
   def inodeSym(path: String) = (inodeNumber(path), symbolic(path))
   def inodeSym(file: File): (Long, Boolean) = inodeSym(file.getAbsolutePath)
+
+  def byId(id: Int): Some[InodeEntry] = ???
+  def all: List[InodeEntry] = ???
+  def delete(id: Int): Unit = ???
+  def save(entity: InodeEntry): Unit = ???
 }

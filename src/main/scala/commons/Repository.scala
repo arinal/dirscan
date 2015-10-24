@@ -5,6 +5,4 @@ trait Repository[A <: Entity] {
   def all: List[A]
   def save(entity: A)
   def delete(id: Int)
-
-  def reconstruct()
 }

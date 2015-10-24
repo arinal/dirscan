@@ -1,45 +1,48 @@
 package dirscan.ui.konsole
 
-import dirscan.infras.data.scalikejdbc.FileScalikeJdbcRepo
+import dirscan.infras.data.scalikejdbc.{ScalikeJdbcHelper, FileScalikeJdbcRepo}
 import dirscan.models.{DirectoryEntry, InodeEntry}
 import dirscan.models.services.FileSyncer
 
 class UIWorkflow(workingPath: String, databaseName: String) {
 
-  val syncer = FileSyncer(workingPath, new FileScalikeJdbcRepo(databaseName))
+  ScalikeJdbcHelper.init(databaseName)
+  val syncer = FileSyncer(workingPath, new FileScalikeJdbcRepo()(ScalikeJdbcHelper.session))
 
   def executeNewDb() {
-    syncer.prepareTargetRepo()
-    println(s"Storing list of items within the current directory into “$databaseName”…")
+    ScalikeJdbcHelper.reconstruct(databaseName)
+    println(s"Storing list of items within the current directory into “$databaseName”……")
     syncer.transfer()
     println("Done.")
   }
 
   def executeListDb() {
-    println("Listing stored items from “list”:")
+    println(s"Listing stored items from “$databaseName”……")
     syncer.allIndexedEntries foreach printEntry
   }
 
   def executeDiff() {
-    val (pluses, minuses) = syncer.diff
-
-    if (pluses.nonEmpty) println("Add list…")
+    val (pluses, minuses, empty) = diffAndCheckEmptiness
+    if (empty) return
+    if (pluses.nonEmpty) println("Files to add:")
     pluses foreach printEntry
-    if (minuses.nonEmpty) println("Remove list…")
+    if (minuses.nonEmpty) println("Files to remove:")
     minuses foreach printEntry
-
-    (pluses, minuses)
   }
 
-  def executeUpdateDb() = {
+  def executeUpdateDb() {
+    val (pluses, minuses, empty) = diffAndCheckEmptiness
+    if (empty) return
+    println(s"Updating list of items within current directory into “$databaseName”……")
+    syncer.patch(pluses, minuses)
+    println("Done.")
+  }
+  
+  def diffAndCheckEmptiness = {
     val (pluses, minuses) = syncer.diff
-    if (pluses.isEmpty && minuses.isEmpty)
-      println("There are no differences. DB is already updated.")
-    else {
-      println(s"Updating list of items within current directory into “$databaseName”…")
-      syncer.patch(pluses, minuses)
-      println("Done.")
-    }
+    val empty = pluses.isEmpty && minuses.isEmpty
+    if (empty) println("There are no differences. Done.")
+    (pluses, minuses, empty)
   }
 
   def printEntry(f: InodeEntry) {

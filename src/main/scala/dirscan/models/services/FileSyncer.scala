@@ -5,14 +5,12 @@ import dirscan.models.{FileRepo, InodeEntry}
 
 class FileSyncer(path: String, indexRepo: FileRepo, actualRepo: FileRepo) {
 
-  def prepareTargetRepo() = indexRepo.reconstruct()
+  def allIndexedEntries = indexRepo.all
 
   def transfer() {
     val sources = FileTraverser.traverseRepo(path, actualRepo) sortBy (_.level)
-    sources.foreach(indexRepo.save(_))
+    sources.foreach(indexRepo.save)
   }
-
-  def allIndexedEntries = indexRepo.all
 
   def diff = {
     val fromFiles = FileTraverser.traverseRepo(path, actualRepo).toSet
