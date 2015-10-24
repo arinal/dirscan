@@ -1,4 +1,7 @@
 # dirscan
+
+[![Circle CI](https://circleci.com/gh/arinal/dirscan.svg?style=svg)](https://circleci.com/gh/arinal/dirscan)
+
 A simple program to store the list of all files, directories, and symbolic links within its current working directory in
 a H2 database file. Please note that following directories referenced by symbolic links aren't implemented.
 
