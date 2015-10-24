@@ -4,9 +4,12 @@ import java.io.File
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{Files, Paths}
 
+import dirscan.models.services.FileTraverser
 import dirscan.models.{DirectoryEntry, FileEntry, FileRepo, InodeEntry}
 
-object FileSystemRepo extends FileRepo {
+class FileSystemRepo(rootPath: String) extends FileRepo {
+
+  def all: List[InodeEntry] = FileTraverser.traverseRepo(rootPath, Some(this))
 
   def byPath(path: String): Option[InodeEntry] = {
     implicit val f2e = (f: File) => {
@@ -40,12 +43,24 @@ object FileSystemRepo extends FileRepo {
     inode.toLong
   }
 
+  def save(entity: InodeEntry) {
+    val file = new File(entity.fullName)
+    if (entity.isInstanceOf[DirectoryEntry]) file.mkdir() else file.createNewFile()
+  }
+
+  def delete(path: String) = {
+    val file = new File(path)
+    if (file.exists()) file.delete()
+  }
+
   def symbolic(path: String): Boolean = Files.isSymbolicLink(Paths.get(path))
   def inodeSym(path: String) = (inodeNumber(path), symbolic(path))
   def inodeSym(file: File): (Long, Boolean) = inodeSym(file.getAbsolutePath)
 
-  def byId(id: Int): Some[InodeEntry] = ???
-  def all: List[InodeEntry] = ???
-  def delete(id: Int): Unit = ???
-  def save(entity: InodeEntry): Unit = ???
+  def delete(id: Int) = ???
+  def byId(id: Int) = ???
+}
+
+object FileSystemRepo {
+  def apply(rootPath: String  = ".") = new FileSystemRepo(rootPath)
 }

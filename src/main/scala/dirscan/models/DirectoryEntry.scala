@@ -23,11 +23,7 @@ case class DirectoryEntry(_name: String = "",
   def mkdir(name: String, inode: Long = 0, symbolic: Boolean = false) =
     DirectoryEntry.fromParent(Some(this), name, inode, symbolic)
 
-  def add(node: InodeEntry) {
-    if (node.parentId == id)
-      childrenMap(node.name) = node
-  }
-
+  def add(node: InodeEntry) = if (node.parentId == id) childrenMap(node.name) = node
   def add(nodes: InodeEntry*): Unit = add(nodes.toList)
   def add(nodes: List[InodeEntry]): Unit = nodes.foreach(n => add(n))
 }

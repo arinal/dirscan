@@ -16,10 +16,11 @@ object FileTraverser {
     TreeVisitor.traverse[InodeEntry](entries.toList)
   }
 
-  def traverseRepo(path: String, fileRepo: FileRepo = FileSystemRepo): List[InodeEntry] = {
-    val roots = fileRepo.childrenOf(path).map(Utils.removeParent)
+  def traverseRepo(path: String, someFileRepo: Option[FileRepo] = None) = {
+    val fileRepo = someFileRepo getOrElse FileSystemRepo(path)
+    val roots = fileRepo childrenOf path map Utils.removeParent
     implicit val fanoutFile = (n: InodeEntry) => n match {
-      case dir: DirectoryEntry => fileRepo.childrenOf(dir)
+      case dir: DirectoryEntry => fileRepo childrenOf dir
       case _: FileEntry => List()
     }
     TreeVisitor.traverse[InodeEntry](roots)

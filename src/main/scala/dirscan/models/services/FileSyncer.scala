@@ -1,19 +1,15 @@
 package dirscan.models.services
 
-import dirscan.infras.data.files.FileSystemRepo
 import dirscan.models.{FileRepo, InodeEntry}
 
 class FileSyncer(path: String, indexRepo: FileRepo, actualRepo: FileRepo) {
 
   def allIndexedEntries = indexRepo.all
 
-  def transfer() {
-    val sources = FileTraverser.traverseRepo(path, actualRepo) sortBy (_.level)
-    sources.foreach(indexRepo.save)
-  }
+  def transfer() = actualRepo.all foreach indexRepo.save
 
   def diff = {
-    val fromFiles = FileTraverser.traverseRepo(path, actualRepo).toSet
+    val fromFiles = actualRepo.all.toSet
     val fromIndex = allIndexedEntries.toSet
     (fromFiles -- fromIndex, fromIndex -- fromFiles)
   }
@@ -27,9 +23,4 @@ class FileSyncer(path: String, indexRepo: FileRepo, actualRepo: FileRepo) {
     val (pluses, minuses) = diffTuple
     patch(pluses, minuses)
   }
-}
-
-object FileSyncer {
-  def apply(path: String, indexRepo: FileRepo, actualRepo: FileRepo = FileSystemRepo) =
-    new FileSyncer(path, indexRepo, actualRepo)
 }

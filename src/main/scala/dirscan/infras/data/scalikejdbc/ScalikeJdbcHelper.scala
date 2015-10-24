@@ -29,7 +29,8 @@ object ScalikeJdbcHelper {
       directory boolean)""".execute().apply
   }
 
-  def purgeDatabase(fileName: String) = List(s"$fileName.mv.db", s"$fileName.trace.db") map (new File(_)) filter (_.exists()) foreach (_.delete())
+  def purgeDatabase(fileName: String) =
+    List(s"$fileName.mv.db", s"$fileName.trace.db") map (new File(_)) filter (_.exists()) foreach (_.delete())
 
   def reconstruct(fileName: String) {
     purgeDatabase(fileName)

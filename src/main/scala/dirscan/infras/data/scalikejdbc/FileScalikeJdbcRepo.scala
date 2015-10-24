@@ -27,5 +27,6 @@ class FileScalikeJdbcRepo(implicit session: DBSession) extends FileRepo {
         ${if (file.parentId == 0) null else file.parentId})""".update().apply
 }
 
-
-
+object FileScalikeJdbcRepo {
+  def apply(implicit session: DBSession = ScalikeJdbcHelper.session) = new FileScalikeJdbcRepo()
+}

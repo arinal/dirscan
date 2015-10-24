@@ -16,8 +16,8 @@ case class FileEntry(_name: String = "",
 object FileEntry {
   def fromParent(name: String, inode: Long, parent: Option[DirectoryEntry],
             symbolic: Boolean = false, rootPrefix: String = "") = {
-    val fullName = Utils.chooseFullname(name = name, parentName = parent.map(_.fullName).getOrElse(""))
-    val dir = new FileEntry(name, fullName, inode, parent.map(_.id).getOrElse(0), symbolic)
+    val fullName = Utils.chooseFullname(name = name, parentName = parent map (_.fullName) getOrElse "")
+    val dir = new FileEntry(name, fullName, inode, parent map (_.id) getOrElse 0, symbolic)
     dir.parent = parent
     dir
   }

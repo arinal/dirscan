@@ -1,5 +1,6 @@
 package dirscan.ui.konsole
 
+import dirscan.infras.data.files.FileSystemRepo
 import dirscan.infras.data.scalikejdbc.{ScalikeJdbcHelper, FileScalikeJdbcRepo}
 import dirscan.models.{DirectoryEntry, InodeEntry}
 import dirscan.models.services.FileSyncer
@@ -7,7 +8,7 @@ import dirscan.models.services.FileSyncer
 class UIWorkflow(workingPath: String, databaseName: String) {
 
   ScalikeJdbcHelper.init(databaseName)
-  val syncer = FileSyncer(workingPath, new FileScalikeJdbcRepo()(ScalikeJdbcHelper.session))
+  val syncer = new FileSyncer(workingPath, FileScalikeJdbcRepo(), new FileSystemRepo(workingPath))
 
   def executeNewDb() {
     ScalikeJdbcHelper.reconstruct(databaseName)

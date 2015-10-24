@@ -7,6 +7,7 @@ import org.scalatest._
 import utils.TestUtils
 
 class FileEntriesSpec extends FlatSpec with Matchers {
+
   "traversing in-memory tree-structures mimicking 'src/test/resources'" should "have length 11" in {
     val (dir1, dir2, file1, file2) = TestUtils.constructTree
     val fileList = FileTraverser.traverse(dir1, dir2, file1, file2)
@@ -24,7 +25,7 @@ class FileEntriesSpec extends FlatSpec with Matchers {
   }
 
   "generate entries targeted 'src/test/resources' path" should "have length 11" in {
-    val fileList = FileTraverser.traverseRepo(rootPath)
+    val fileList = FileTraverser traverseRepo rootPath
 
     fileList should have length 13
     fileList filter (_.isInstanceOf[FileEntry]) should have length 9
@@ -40,7 +41,7 @@ class FileEntriesSpec extends FlatSpec with Matchers {
   }
 
   it should "all be prefixed with 'src/test/playground" in {
-    FileSystemRepo childrenOf rootPath foreach (_.fullName should startWith (rootPath))
+    FileSystemRepo() childrenOf rootPath foreach (_.fullName should startWith (rootPath))
   }
 
   val rootPath = TestUtils.PLAYGROUND_PATH

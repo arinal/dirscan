@@ -17,9 +17,6 @@ class InodeEntry(val name: String,
   def parent = _parent
   def parent_= (parent: Option[DirectoryEntry]) {
     val _id = parent.map(_.id).getOrElse(0)
-    if (_id == parentId)
-      _parent = parent
+    if (_id == parentId) _parent = parent
   }
-
-  def path = parent.map(p => p.fullName).getOrElse("")
 }
