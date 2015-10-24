@@ -82,9 +82,9 @@ Listing stored items from “list”……
 (dir) ./.git/objects/25
 ```
 
-> Note that we'are not printing all of the files to the screen, instead we've redirected the output to wc instead. Console
-> screen printings are much slower processes even compared to device writings due to the nature of tty drivers. Plus, you
-> don't want your precious screen bloated with garbage do you?
+> Note that we'are not printing all of the files to the screen, instead we've just redirected the output to wc (word count).
+> Console screen printings are much slower processes even compared to device writings due to the nature of tty drivers.
+> Plus, you don't want your precious screen bloated with garbage do you?
 
 At this moment, we're expecting a zero differences between filesystem and index.
 ```
@@ -100,7 +100,7 @@ Observe how many diffs, remember not to print all the differences to the screen!
 $ ./dirscan diff=db | wc -l
 23760
 ```
-Phew, 20 thousands files to go, intermixed with files to add and delete. Cross our fingers and run sync..
+Phew! 20 thousands files to go, intermixed with files to add and delete! Cross our fingers and run sync..
 ```
 $ ./dirscan update=db
 Updating list of items within current directory into “db”……
