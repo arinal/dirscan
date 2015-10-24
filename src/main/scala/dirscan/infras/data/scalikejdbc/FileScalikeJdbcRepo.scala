@@ -7,7 +7,7 @@ import scalikejdbc._
 
 class FileScalikeJdbcRepo(fileName: String) extends FileRepo {
 
-  GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(enabled = false)
+  GlobalSettings.loggingSQLAndTime = LoggingSQLAndTimeSettings(enabled = false, logLevel = 'info)
   ConnectionPool.singleton(s"jdbc:h2:file:./$fileName", "", "")
 
   // Class.forName("org.sqlite.JDBC")
