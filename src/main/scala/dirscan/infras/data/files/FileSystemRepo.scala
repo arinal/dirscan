@@ -48,7 +48,7 @@ class FileSystemRepo(rootPath: String) extends FileRepo {
     if (entity.isInstanceOf[DirectoryEntry]) file.mkdir() else file.createNewFile()
   }
 
-  def delete(path: String) = {
+  def delete(path: String) {
     val file = new File(path)
     if (file.exists()) file.delete()
   }
@@ -59,6 +59,7 @@ class FileSystemRepo(rootPath: String) extends FileRepo {
 
   def delete(id: Int) = ???
   def byId(id: Int) = ???
+  def length: Int = ???
 }
 
 object FileSystemRepo {

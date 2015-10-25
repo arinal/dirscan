@@ -1,5 +1,7 @@
 package dirscan.models.services
 
+import java.io.File
+
 import commons.TreeVisitor
 import dirscan.infras.data.files.FileSystemRepo
 import dirscan.models.{DirectoryEntry, FileEntry, FileRepo, InodeEntry}
@@ -16,13 +18,17 @@ object FileTraverser {
     TreeVisitor.traverse[InodeEntry](entries.toList)
   }
 
-  def traverseRepo(path: String, someFileRepo: Option[FileRepo] = None) = {
+  def traverseRepo(path: String, someFileRepo: Option[FileRepo] = None, includeParent: Boolean = false) = {
     val fileRepo = someFileRepo getOrElse FileSystemRepo(path)
-    val roots = fileRepo childrenOf path map Utils.removeParent
+    val roots = fileRepo childrenOf path //map Utils.removeParent
     implicit val fanoutFile = (n: InodeEntry) => n match {
       case dir: DirectoryEntry => fileRepo childrenOf dir
       case _: FileEntry => List()
     }
-    TreeVisitor.traverse[InodeEntry](roots)
+    val results = TreeVisitor.traverse[InodeEntry](roots)
+    if (includeParent) fileRepo.byPath(path).get :: results else results
   }
+
+  def deleteRecursively(path: String, someFileRepo: Option[FileRepo] = None) =
+    traverseRepo(path, someFileRepo, includeParent = true).sortBy(-_.level).foreach(f => new File(f.fullName).delete())
 }

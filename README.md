@@ -18,41 +18,41 @@ Implementation wise, dirscan will support four arguments:
 entries if it does not exist anymore.
 
 ## Getting started
-Clone repository from github and make it as current directory
+Clone repository from github and make it as current directory.
 ```
 $ git clone https://github.com/arinal/dirscan.git && cd dirscan
 ```
-Run the test
+Run the test.
 ```
 $ ./activator test
 ```
 
-Run the project via buildscript
+Run the project via build script.
 ```
 $ ./activator run
 ```
-Some menu will be appeared in console, feel free playing around with it :)
+Some menu will be appeared in console, feel free playing around with it.
 
-Assemble an executable file
+Assemble an executable file.
 ```
 $ ./activator assemble
 ```
-Not only does this will create a jar file, but also will prepend it with shebang and shellscript to make it runnable
-without extra `java -jar`. Unfortunately, the file-size is 10MB plus. This is the so called über jar files because all
-the required dependencies are included within. In future commits, we will handle this size problem. The executable file
-is located in target/scala-2.11/dirscan
+Not only does this will create a jar file, but also will prepend it with shebang and shell script to make it runnable
+without extra `java -jar`. Unfortunately, the file-size is 10MB plus because all the required dependencies are included
+within. This is the so called über jar files. In future commits, maybe we will handle this size problem. The executable
+file is located in `target/scala-2.11/dirscan`.
 
-Copy the file to current directory
+Copy the file into current directory.
 ```
 $ cp target/scala-2.11/dirscan .
 ```
 
-Run via the appearing menu
+Run via the appearing menu.
 ```
 $ ./dirscan
 ```
 
-Or you can run it with an argument to bypass menu
+Or you can run it with an argument to bypass menu.
 ```
 $ ./dirscan new=test
 ```
@@ -62,7 +62,7 @@ Is dirscan mature enough? Let's clarify it by testing on directory with more tha
 to be our very own project root folder. Let's assume that we've already built the project and copied dirscan into project's
 root folder.
 
-Examine how many files inside root project's folder
+Examine how many files inside the root project's folder
 ```
 $ find | wc -l
 13059
@@ -115,4 +115,5 @@ Hmm.. that was fast, but are our index really synchronized? Let's run diff again
 $ ./dirscan diff=db
 There are no differences. Done.
 ```
-We've just synchronized 20 thousands files successfully. Mature enough?
+We've just synchronized 20 thousands files successfully. Don't worry, this kind of test is always executed automatically
+on every github push, notice a green 'passed' CircleCI badge on top of this document.

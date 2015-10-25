@@ -5,5 +5,5 @@
 /project/target/
 /target/
 /.idea/
-
+/src/test/temp-playground
 *.db

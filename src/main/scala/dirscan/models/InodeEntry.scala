@@ -3,7 +3,7 @@ package dirscan.models
 import commons.Entity
 import commons.Extensions._
 
-class InodeEntry(val name: String,
+abstract class InodeEntry(val name: String,
                  val fullName: String,
                  val inode: Long,
                  val parentId: Int,

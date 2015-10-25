@@ -6,4 +6,5 @@ trait FileRepo extends Repository[InodeEntry] {
   def byPath(path: String): Option[InodeEntry]
   def childrenOf(path: String): List[InodeEntry]
   def childrenOf(directory: DirectoryEntry): List[InodeEntry]
+  def delete(path: String)
 }

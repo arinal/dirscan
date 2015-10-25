@@ -29,7 +29,7 @@ case class DirectoryEntry(_name: String = "",
 }
 
 object DirectoryEntry {
-  def fromPath(path: String, inode: Long = 0, symbolic: Boolean) =
+  def fromPath(path: String, inode: Long = 0, symbolic: Boolean = false) =
     new DirectoryEntry(_name = path.split('/').last, path, _inode = inode, _symbolic = symbolic)
 
   def fromParent(parent: Option[DirectoryEntry], name: String, inode: Long,
