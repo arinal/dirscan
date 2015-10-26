@@ -7,15 +7,16 @@ import utils.TestUtils
 
 class TraversingFileSystem extends WordSpec with Matchers {
 
-  "generate entries based on playground path" should {
+  "generated entries based on playground path" should {
     val rootPath = TestUtils.PLAYGROUND_PATH
-    val traversedFiles = FileTraverser traverseRepo rootPath
+    val entries = FileTraverser traverseRepo rootPath
 
-    "generate 14 entries" in { traversedFiles should have length 14 }
-    "have 9 files" in { traversedFiles filter (_.isInstanceOf[FileEntry]) should have length 9 }
-    "have 5 dirs" in { traversedFiles filter (_.isInstanceOf[DirectoryEntry]) should have length 5 }
-    "have inode number on each element" in { traversedFiles.foreach (_.inode should be > 100000L) }
-    "consists of two symbolic links" in { traversedFiles.filter (_.symbolic) should have length 2 }
-    "all be prefixed with 'src/test/playground'" in { traversedFiles foreach (_.fullName should startWith(rootPath)) }
+    "have 15 entries"      in (entries should have length 15)
+    "10 files"             in (entries filter (_.isInstanceOf[FileEntry]) should have length 10)
+    "5 dirs"               in (entries filter (_.isInstanceOf[DirectoryEntry]) should have length 5)
+    "2 symbolic links"     in (entries filter (_.symbolic) should have length 2)
+    "max level of 5"       in (entries.map(_.level).sorted.last shouldBe 5)
+    "consistent path each" in (entries foreach (_.fullName should startWith(rootPath)))
+    "valid inode each"     in (entries foreach (_.inode should be > 100000L))
   }
 }

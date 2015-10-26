@@ -20,7 +20,7 @@ object FileTraverser {
 
   def traverseRepo(path: String, someFileRepo: Option[FileRepo] = None, includeParent: Boolean = false) = {
     val fileRepo = someFileRepo getOrElse FileSystemRepo(path)
-    val roots = fileRepo childrenOf path //map Utils.removeParent
+    val roots = fileRepo childrenOf path
     implicit val fanoutFile = (n: InodeEntry) => n match {
       case dir: DirectoryEntry => fileRepo childrenOf dir
       case _: FileEntry => List()

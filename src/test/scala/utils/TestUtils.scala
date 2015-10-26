@@ -13,7 +13,7 @@ object TestUtils {
 
   val tempPlaygroundRoot = DirectoryEntry.fromPath(TEMP_PLAYGROUND_PATH)
   val fileSystemRepo = FileSystemRepo(TEMP_PLAYGROUND_PATH)
-  
+
   def constructTree(parent: DirectoryEntry = DirectoryEntry()) = {
     val dir1 = parent.mkdir("dir1")
     val dir2 = parent.mkdir("dir2")
@@ -36,12 +36,15 @@ object TestUtils {
     val dir2Dir1File1Ln = dir2dir1.mkfile("file1ln", symbolic = true)
     dir2dir1.add(dir2Dir1File1, dir2Dir1File2, dir2Dir1File1Ln)
 
+    val dir3file1 = dir3.mkfile("file1")
+    dir3.add(dir3file1)
+
     (dir1, dir2, dir3, file1, file2)
   }
 
   def constructTree(parentPath: String): (DirectoryEntry, DirectoryEntry, DirectoryEntry, FileEntry, FileEntry) =
     constructTree(DirectoryEntry.fromPath(parentPath))
-  
+
   def constructTempPlayground() {
     fileSystemRepo.save(tempPlaygroundRoot)
 
@@ -58,6 +61,6 @@ object TestUtils {
     val fileList = FileTraverser traverse(dir1, dir2, dir3, file1, file2) sortBy (_.level)
     fileList foreach fileSystemRepo.save
   }
-  
+
   def purgeTempPlayground() = FileTraverser.deleteRecursively(tempPlaygroundRoot.fullName, Some(fileSystemRepo))
 }

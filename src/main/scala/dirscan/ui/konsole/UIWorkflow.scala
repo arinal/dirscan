@@ -35,11 +35,11 @@ class UIWorkflow(workingPath: String, databaseName: String) {
   def executeUpdateDb() {
     val (pluses, minuses, empty) = diffAndCheckEmptiness
     if (empty) return
-    println(s"Updating list of items within current directory into “$databaseName”……")
+     println(s"Updating list of items within current directory into “$databaseName”……")
     syncer.patch(pluses, minuses)
     println("Done.")
   }
-  
+
   def diffAndCheckEmptiness = {
     val (pluses, minuses) = syncer.diff
     val empty = pluses.isEmpty && minuses.isEmpty

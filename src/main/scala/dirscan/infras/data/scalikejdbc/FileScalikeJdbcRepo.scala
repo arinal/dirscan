@@ -16,19 +16,18 @@ class FileScalikeJdbcRepo(implicit session: DBSession) extends FileRepo {
   def childrenOf(id: Int) = sql"$mainQuery where parent = $id"
   def childrenOf(directory: DirectoryEntry) = childrenOf(directory.id)
   def byPath(path: String) = sql"$mainQuery where fullname = $path"
+
+  def length: Int = sql"select count(*) from $tableName".map(_.int(1)).single().apply().getOrElse(0)
+
   def delete(id: Int) = sql"delete from files where id = $id".update().apply()
-
   def delete(path: String) = sql"delete from files where fullname = $path".update().apply()
-  def length: Int = sql"select count(*) from $tableName".map(rs => rs.int(1)).single().apply().getOrElse(0)
 
-  def save(file: InodeEntry) =
-  sql"""insert into $tableName ($allFields) values (
+  def save(file: InodeEntry) = sql"""insert into $tableName ($allFields) values (
         ${file.id}, ${file.name},
         ${file.inode}, ${file.fullName},
         ${file.level}, ${file.symbolic},
         ${file.isInstanceOf[DirectoryEntry]},
         ${if (file.parentId == 0) null else file.parentId})""".update().apply()
-
 }
 
 object FileScalikeJdbcRepo {
